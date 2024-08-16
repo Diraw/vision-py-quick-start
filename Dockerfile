@@ -10,5 +10,8 @@ COPY . /app
 # Install the application dependencies
 RUN pip install -r requirements.txt
 
+# Expose the port that the Flask app runs on
+EXPOSE 5000
+
 # Define the entry point for the container
-CMD ["flask", "run", "--host=0.0.0.0"]
+CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
