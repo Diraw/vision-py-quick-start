@@ -1,8 +1,8 @@
 # Use the official Python image as the base image
 FROM python:3.11
 
-# 安装必要的库
-RUN apt-get update && apt-get install -y libgl1
+# Install necessary libraries
+RUN apt-get update && apt-get install -y libgl1-mesa-glx
 
 # Set the working directory in the container
 WORKDIR /app
