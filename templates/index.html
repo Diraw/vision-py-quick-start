@@ -8,7 +8,17 @@
 
 <body>
     <h1>Video Streaming</h1>
-    <img src="{{ url_for('video_feed') }}" width="640" height="480">
+    <video id="video" width="640" height="480" autoplay></video>
+    <script>
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                document.getElementById('video').srcObject = stream;
+                // 在这里可以将视频帧发送到服务器
+            })
+            .catch(error => {
+                console.error("Error accessing camera: ", error);
+            });
+    </script>
 </body>
 
 </html>
