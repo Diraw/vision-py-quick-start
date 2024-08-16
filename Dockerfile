@@ -1,6 +1,9 @@
 # Use the official Python image as the base image
 FROM python:3.11
 
+# 安装必要的库
+RUN apt-get update && apt-get install -y libgl1
+
 # Set the working directory in the container
 WORKDIR /app
 
@@ -17,4 +20,4 @@ EXPOSE 5000
 ENV FLASK_APP=app.py
 
 # Define the entry point for the container
-CMD ["python", "app.py"]
+CMD ["flask", "run", "--host=0.0.0.0"]
