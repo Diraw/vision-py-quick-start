@@ -4,10 +4,11 @@ import socket
 import struct
 import subprocess
 from flask_talisman import Talisman
+from flask_cors import CORS
 
 app = Flask(__name__)
 Talisman(app)  # force_https=False
-
+CORS(app)
 
 def send_frames():
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
