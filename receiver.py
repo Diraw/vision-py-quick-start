@@ -1,48 +1,43 @@
-import cv2
 import socket
 import struct
+import cv2
 import numpy as np
-from frame_processor import processe_frame  # Import the function
+from frame_processor import processe_frame
 import time
 
-# 初始化时间变量
+# Initialize the time variable
 pTime = 0
 
-# 创建服务器 socket
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.bind(("localhost", 8000))
 server_socket.listen(1)
-connection, client_address = server_socket.accept()
 
-try:
-    while True:
-        # 读取帧大小
-        data = connection.recv(struct.calcsize("<L"))
-        if not data:
-            break
-        frame_size = struct.unpack("<L", data)[0]
-
-        # 读取帧数据
-        frame_data = b""
-        while len(frame_data) < frame_size:
-            packet = connection.recv(frame_size - len(frame_data))
-            if not packet:
+while True:
+    client_socket, _ = server_socket.accept()
+    try:
+        while True:
+            data = client_socket.recv(struct.calcsize("<L"))
+            if not data:
                 break
-            frame_data += packet
+            frame_size = struct.unpack("<L", data)[0]
 
-        frame = np.frombuffer(frame_data, dtype=np.uint8)
-        frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
+            frame_data = b""
+            while len(frame_data) < frame_size:
+                packet = client_socket.recv(frame_size - len(frame_data))
+                if not packet:
+                    break
+                frame_data += packet
 
-        # 对帧进行处理
-        processed_frame, pTime = processe_frame(frame, pTime)
+            frame = cv2.imdecode(np.frombuffer(frame_data, np.uint8), cv2.IMREAD_COLOR)
 
-        # 编码处理后的帧
-        _, buffer = cv2.imencode(".jpg", processed_frame)
-        processed_data = buffer.tobytes()
+            # Process the frame and update pTime
+            processed_frame, pTime = processe_frame(frame, pTime)
 
-        # 发送处理后的帧大小和数据
-        connection.sendall(struct.pack("<L", len(processed_data)) + processed_data)
+            _, buffer = cv2.imencode(".jpg", processed_frame)
+            processed_data = buffer.tobytes()
 
-finally:
-    connection.close()
-    server_socket.close()
+            client_socket.sendall(
+                struct.pack("<L", len(processed_data)) + processed_data
+            )
+    finally:
+        client_socket.close()
