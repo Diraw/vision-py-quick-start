@@ -5,11 +5,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Video Stream</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
 </head>
 
 <body>
     <h1>Video Streaming</h1>
-    <img src="{{ url_for('video_feed') }}" width="640" height="480" alt="Video Stream">
+    <video id="video" width="640" height="480" autoplay style="display:none;"></video>
+    <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
+    <img id="output" width="640" height="480" alt="Processed Video Output">
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const context = canvas.getContext('2d');
+        const output = document.getElementById('output');
+        const socket = io();
+
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+                video.onplay = () => {
+                    setInterval(() => {
+                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        const dataURL = canvas.toDataURL('image/jpeg');
+                        const base64Data = dataURL.split(',')[1];
+                        socket.emit('video_frame', base64Data);
+                    }, 100);
+                };
+            })
+            .catch(error => {
+                console.error('无法访问摄像头：', error);
+            });
+
+        socket.on('processed_frame', data => {
+            output.src = 'data:image/jpeg;base64,' + data;
+        });
+    </script>
 </body>
 
 </html>

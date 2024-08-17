@@ -7,7 +7,7 @@ hands = mpHands.Hands()
 mpDraw = mp.solutions.drawing_utils
 
 
-def processe_frame(frame, pTime):
+def process_frame(frame, pTime):
     # 水平翻转图像
     img = cv2.flip(frame, 1)
 

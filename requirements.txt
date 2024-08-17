@@ -4,3 +4,4 @@ opencv-python==4.8.0.74
 mediapipe
 flask-talisman
 flask_cors
+flask_socketio
