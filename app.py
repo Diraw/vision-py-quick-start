@@ -21,23 +21,26 @@ def index():
 @socketio.on("video_frame")
 def handle_video_frame(data):
     global pTime
-    # Base64 解码
-    img_data = base64.b64decode(data)
-    img_array = np.frombuffer(img_data, dtype=np.uint8)
-    frame = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
+    try:
+        # Base64 解码
+        img_data = base64.b64decode(data)
+        img_array = np.frombuffer(img_data, dtype=np.uint8)
+        frame = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
 
-    if frame is None:
-        print("Failed to decode frame")
-        return
+        if frame is None:
+            print("Failed to decode frame")
+            return
 
-    # 使用process_frame处理帧
-    processed_frame, pTime = process_frame(frame, pTime)
+        # 使用 process_frame 处理帧
+        processed_frame, pTime = process_frame(frame, pTime)
 
-    # 编码为JPEG格式并重新编码为Base64字符串
-    _, buffer = cv2.imencode(".jpg", processed_frame)
-    processed_data = base64.b64encode(buffer).decode("utf-8")
+        # 编码为 JPEG 格式并重新编码为 Base64 字符串
+        _, buffer = cv2.imencode(".jpg", processed_frame)
+        processed_data = base64.b64encode(buffer).decode("utf-8")
 
-    emit("processed_frame", processed_data)
+        emit("processed_frame", processed_data)
+    except Exception as e:
+        print(f"Error processing frame: {e}")
 
 
 if __name__ == "__main__":

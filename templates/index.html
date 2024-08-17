@@ -10,9 +10,9 @@
 
 <body>
     <h1>Video Streaming</h1>
-    <video id="video" width="640" height="480" autoplay style="display:none;"></video>
-    <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
-    <img id="output" width="640" height="480" alt="Processed Video Output">
+    <video id="video" width="320" height="240" autoplay style="display:none;"></video>
+    <canvas id="canvas" width="320" height="240" style="display:none;"></canvas>
+    <img id="output" width="320" height="240" alt="Processed Video Output">
 
     <script>
         const video = document.getElementById('video');
@@ -21,16 +21,16 @@
         const output = document.getElementById('output');
         const socket = io();
 
-        navigator.mediaDevices.getUserMedia({ video: true })
+        navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 240 } })
             .then(stream => {
                 video.srcObject = stream;
                 video.onplay = () => {
                     setInterval(() => {
                         context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                        const dataURL = canvas.toDataURL('image/jpeg');
+                        const dataURL = canvas.toDataURL('image/jpeg', 0.3); // 调整压缩质量
                         const base64Data = dataURL.split(',')[1];
                         socket.emit('video_frame', base64Data);
-                    }, 100);
+                    }, 200); // 增加间隔时间
                 };
             })
             .catch(error => {
