@@ -11,7 +11,7 @@ WORKDIR /app
 COPY . /app
 
 # Install the application dependencies
-RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 # Expose the port that the Flask app runs on
 EXPOSE 5000
