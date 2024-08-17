@@ -3,8 +3,10 @@ import cv2
 import socket
 import struct
 import subprocess
+from flask_talisman import Talisman
 
 app = Flask(__name__)
+Talisman(app)  # force_https=False
 
 
 def send_frames():
