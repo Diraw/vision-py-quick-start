@@ -2,13 +2,12 @@ import cv2
 import mediapipe as mp
 import time
 
+mpHands = mp.solutions.hands
+hands = mpHands.Hands()
+mpDraw = mp.solutions.drawing_utils
+
 
 def process_frame(frame, pTime):
-    # 初始化 Mediapipe Hands
-    mpHands = mp.solutions.hands
-    hands = mpHands.Hands()
-    mpDraw = mp.solutions.drawing_utils
-
     # 水平翻转图像
     img = cv2.flip(frame, 1)
 
