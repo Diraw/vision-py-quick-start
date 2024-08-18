@@ -4,15 +4,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Stream</title>
+    <title>手掌特征点检测 Hand Tracking</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        #video,
+        #canvas,
+        #output {
+            width: 100%;
+            max-width: 640px;
+            height: auto;
+            margin: 10px 0;
+        }
+    </style>
 </head>
 
 <body>
-    <h1>Video Streaming</h1>
-    <video id="video" width="320" height="240" autoplay style="display:none;"></video>
-    <canvas id="canvas" width="320" height="240" style="display:none;"></canvas>
-    <img id="output" width="320" height="240" alt="Processed Video Output">
+    <h1>手掌特征点检测 Hand Tracking</h1>
+    <video id="video" autoplay style="display:none;"></video>
+    <canvas id="canvas" style="display:none;"></canvas>
+    <img id="output" alt="Processed Video Output">
 
     <script>
         const video = document.getElementById('video');
@@ -21,16 +39,18 @@
         const output = document.getElementById('output');
         const socket = io();
 
-        navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 240 } })
+        navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 360 } })
             .then(stream => {
                 video.srcObject = stream;
                 video.onplay = () => {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
                     setInterval(() => {
                         context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                        const dataURL = canvas.toDataURL('image/jpeg', 0.3); // 调整压缩质量
+                        const dataURL = canvas.toDataURL('image/jpeg', 0.7);
                         const base64Data = dataURL.split(',')[1];
                         socket.emit('video_frame', base64Data);
-                    }, 200); // 增加间隔时间
+                    }, 35); // 减少间隔时间以提高帧数
                 };
             })
             .catch(error => {
