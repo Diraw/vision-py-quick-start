@@ -50,7 +50,7 @@
                         const dataURL = canvas.toDataURL('image/jpeg', 0.7);
                         const base64Data = dataURL.split(',')[1];
                         socket.emit('video_frame', base64Data);
-                    }, 35); // 减少间隔时间以提高帧数
+                    }, 300); // 减少间隔时间以提高帧数
                 };
             })
             .catch(error => {
